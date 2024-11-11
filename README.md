@@ -1,7 +1,7 @@
 # AI powered expert system demo
 1. `$ git clone` this repo && `$ cd` into root of it.
 2.  Build image for web app with `$ apolo-flow build pfb`
-3. `$ apolo-flow run ollama` -- VLLM server underhood the ollama
+3. `$ apolo-flow run ollama` -- VLLM server under hood of ollama
 4.  `$ apolo-flow run pgpt` -- start PrivateGPT web server.
 
 # Run ollama locally:
