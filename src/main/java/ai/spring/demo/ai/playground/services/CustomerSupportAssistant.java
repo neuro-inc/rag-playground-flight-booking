@@ -59,13 +59,13 @@ public class CustomerSupportAssistant {
 				.defaultAdvisors(
 						new PromptChatMemoryAdvisor(chatMemory), // Chat Memory
 						// new VectorStoreChatMemoryAdvisor(vectorStore)),
-					
+
 						new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()), // RAG
 						// new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()
 						// 	.withFilterExpression("'documentType' == 'terms-of-service' && region in ['EU', 'US']")),
-						
+
 						new LoggingAdvisor())
-						
+
 				.defaultFunctions("getBookingDetails", "changeBooking", "cancelBooking") // FUNCTION CALLING
 
 				.build();
@@ -73,8 +73,7 @@ public class CustomerSupportAssistant {
 	}
 
 	public Flux<String> chat(String chatId, String userMessageContent) {
-
-		return this.chatClient.prompt()
+        return this.chatClient.prompt()
 				.system(s -> s.param("current_date", LocalDate.now().toString()))
 				.user(userMessageContent)
 				.advisors(a -> a

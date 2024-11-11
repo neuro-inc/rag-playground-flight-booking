@@ -1,9 +1,12 @@
 # AI powered expert system demo
 1. `$ git clone` this repo && `$ cd` into root of it.
-2. `$ apolo-flow run ollama` -- VLLM server underhood the ollama
 2.  Build image for web app with `$ apolo-flow build pfb`
-3.  Create secret with HuggingFace token to pull models `$ apolo secret add OPENAI_API_KEY <token>`
+3. `$ apolo-flow run ollama` -- VLLM server underhood the ollama
 4.  `$ apolo-flow run pgpt` -- start PrivateGPT web server.
+
+# Run ollama locally:
+1. Run ollama in docker https://hub.docker.com/r/ollama/ollama
+2. Run qwen2:1.5b model qwen2 with 1.5b parameters locally - ```docker exec -it ollama ollama run qwen2:1.5b```
 
 Spring AI re-implementation of https://github.com/marcushellberg/java-ai-playground
 
