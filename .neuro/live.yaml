@@ -1,0 +1,40 @@
+kind: live
+title: playground flight booking
+
+defaults:
+    life_span: 5d
+
+volumes:
+    ollama_models:
+        remote: storage:$[[ flow.project_id ]]/ollama_models
+        mount: /root/.ollama
+        local: models
+
+images:
+    pfb:
+        ref: image:$[[ project.id ]]:v1
+        dockerfile: $[[ flow.workspace ]]/Dockerfile
+        context: $[[ flow.workspace ]]/
+        build_preset: cpu-large
+
+jobs:
+    pgpt:
+        image: ${{ images.pfb.ref }}
+        name: pfb
+        preset: cpu-small
+        http_port: "8080"
+        # detach: true
+        browse: true
+        env:
+            OLLAMA_API_BASE: http://${{ inspect_job('ollama').internal_hostname_named }}:11434
+
+    ollama:
+        image: ollama/ollama
+        volumes:
+            - ${{ volumes.ollama_models.ref_rw }}
+        preset: a100x2
+        detach: true
+        env:
+            MODEL: "llama3.2"
+        http_port: "11434"
+        entrypoint: "bash -c 'ollama pull ${MODEL} && ollama serve'" #Running ollama serve without an ampersand (&) means it runs in the foreground.This command starts the Ollama server. If it runs in the foreground and is the main process (PID 1) in the container, Docker will keep the container running as long as this process is active.
