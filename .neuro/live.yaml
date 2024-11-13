@@ -9,6 +9,10 @@ volumes:
     remote: storage:$[[ flow.project_id ]]/ollama_models
     mount: /root/.ollama
     local: models
+  pgdata:
+      remote: storage:$[[ flow.project_id ]]/pgdata
+      mount: /var/lib/postgresql/data
+      local: pgdata
 
 images:
   pfb:
@@ -27,7 +31,7 @@ jobs:
     browse: true
     env:
       OLLAMA_API_BASE: http://${{ inspect_job('ollama').internal_hostname_named }}:11434
-
+      POSTGRES_HOST: ${{ inspect_job('pgvector').internal_hostname_named }}
   ollama:
     image: ollama/ollama
     volumes:
@@ -38,3 +42,15 @@ jobs:
       MODEL: "llama3.2"
     http_port: "11434"
     entrypoint: "bash -c 'ollama serve & sleep 10 && ollama pull ${MODEL} && sleep infinity'"
+
+  pgvector:
+      image: pgvector/pgvector:pg16
+      detach: true
+      preset: cpu-small
+      env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          PGDATA: ${{ volumes.pgdata.mount }}/pgdata
+      volumes:
+          - ${{ volumes.pgdata.ref_rw }}

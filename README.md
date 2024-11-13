@@ -1,12 +1,39 @@
 # AI powered expert system demo
 1. `$ git clone` this repo && `$ cd` into root of it.
 2.  Build image for web app with `$ apolo-flow build pfb`
-3. `$ apolo-flow run ollama` -- VLLM server under hood of ollama
-4.  `$ apolo-flow run pgpt` -- start PrivateGPT web server.
+3.  Create block storage for PGVector with `$ apolo disk create --name pgdata 10G --timeout-unused 100d`
+4.  `$ apolo-flow run pgvector` -- start postgresql.
+3.  `$ apolo-flow run ollama` -- start Ollama with VLLM server under the hood
+4.  `$ apolo-flow run pgpt` -- start application.
 
 # Run ollama locally:
 1. Run ollama in docker https://hub.docker.com/r/ollama/ollama
 2. Run qwen2:1.5b model qwen2 with 1.5b parameters locally - ```docker exec -it ollama ollama run qwen2:1.5b```
+
+# Forward ollama:
+```bash
+apolo job port-forward {job name} {port}:{port}
+apolo job port-forward playground-flight-booking-ollama 11434:11434
+```
+
+# Forward DB:
+```bash
+apolo job port-forward playground-flight-booking-pgvector 5432:5432
+psql -h 0.0.0.0 -U postgres -d postgres
+```
+
+# Rest http call:
+```
+POST http://localhost:11434/api/generate
+Accept: application/json
+
+{
+"model": "llama3.2:1b",
+"prompt": "What color is the sky at different times of the day? Respond using JSON",
+"format": "json",
+"stream": false
+}
+```
 
 Spring AI re-implementation of https://github.com/marcushellberg/java-ai-playground
 
