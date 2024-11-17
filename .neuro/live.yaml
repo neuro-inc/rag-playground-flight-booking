@@ -10,9 +10,14 @@ volumes:
     mount: /root/.ollama
     local: models
   pgdata:
-      remote: storage:$[[ flow.project_id ]]/pgdata
-      mount: /var/lib/postgresql/data
-      local: pgdata
+    remote: storage:$[[ flow.project_id ]]/pgdata
+    mount: /var/lib/postgresql/data
+    local: pgdata
+  docs:
+    remote: storage:$[[ flow.project_id ]]/docs
+    mount: /usr/src/app/docs
+    local: docs
+    read_only: true
 
 images:
   pfb:
@@ -22,7 +27,7 @@ images:
     build_preset: cpu-large
 
 jobs:
-  pgpt:
+  pfb:
     image: ${{ images.pfb.ref }}
     name: pfb
     preset: cpu-small
@@ -32,6 +37,11 @@ jobs:
     env:
       OLLAMA_API_BASE: http://${{ inspect_job('ollama').internal_hostname_named }}:11434
       POSTGRES_HOST: ${{ inspect_job('pgvector').internal_hostname_named }}
+    volumes:
+#      - ${{ volumes.docs.ref_ro }}
+      - ${{ upload(volumes.docs).ref_ro }} #if docs change a lot, and we want to avoid custom upload each time
+#    entrypoint: "bash" #to enter container bash
+
   ollama:
     image: ollama/ollama
     volumes:

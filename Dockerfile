@@ -4,20 +4,28 @@ FROM eclipse-temurin:22-jdk AS builder
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Copy the entire project, excluding files specified in .dockerignore
-COPY . .
+# Copy Maven wrapper and pom.xml and package.json to download dependencies
+COPY .mvn .mvn
+COPY package.json ./
+COPY mvnw pom.xml ./
 
 # Ensure the Maven wrapper is executable
 RUN chmod +x mvnw
 
+# Download dependencies (cacheable layer)
+RUN ./mvnw dependency:go-offline -B
+
+# Copy the rest of the source code
+COPY src ./src
+
 # Copy 'frontend' into 'src/main/frontend' if required by your project structure
-RUN mkdir -p src/main && mv frontend src/main/frontend
+COPY frontend ./src/main/frontend
 
 # Build the application JAR with the production profile
 RUN ./mvnw clean install -Pproduction -DskipTests -B
 
 # Stage 2: Runtime
-FROM eclipse-temurin:22-jdk-alpine
+FROM eclipse-temurin:22-jre-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app

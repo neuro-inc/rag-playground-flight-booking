@@ -1,10 +1,18 @@
 # AI powered expert system demo
 1. `$ git clone` this repo && `$ cd` into root of it.
-2.  Build image for web app with `$ apolo-flow build pfb`
-3.  Create block storage for PGVector with `$ apolo disk create --name pgdata 10G --timeout-unused 100d`
-4.  `$ apolo-flow run pgvector` -- start postgresql.
-3.  `$ apolo-flow run ollama` -- start Ollama with VLLM server under the hood
-4.  `$ apolo-flow run pgpt` -- start application.
+2.  Create all defined volumes `$ apolo-flow mkvolumes`
+3.  Upload docs `$ apolo-flow upload docs` if we don't use `${{ upload(volumes.docs).ref_ro }}` in the `live.yml`
+4.  Build image for web app with `$ apolo-flow build pfb`
+5. `$ apolo-flow run pgvector` -- start postgresql.
+6. `$ apolo-flow run ollama` -- start Ollama with VLLM server under the hood
+7. `$ apolo-flow run pfb` -- start application.
+
+# Query examples
+```
+GetBookingDetails -  booking number: 102, first: Jane, last: Smith
+Change Booking -  booking number: 102, first: Jane, last: Smith
+CancelBooking -  booking number: 102, first: Jane, last: Smith
+```
 
 # Run ollama locally:
 1. Run ollama in docker https://hub.docker.com/r/ollama/ollama

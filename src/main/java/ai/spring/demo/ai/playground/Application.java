@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -16,6 +17,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @Theme(value = "customer-support-agent")
@@ -32,18 +36,25 @@ public class Application implements AppShellConfigurator {
     @Bean
     CommandLineRunner ingestTermOfServiceToVectorStore(
         EmbeddingModel embeddingModel, VectorStore vectorStore,
-        @Value("classpath:rag/terms-of-service.txt") Resource termsOfServiceDocs) {
+        @Value("file:docs/terms-of-service.txt") Resource termsOfServiceDocs) {
 
-        return args -> {
-            // Ingest the document into the vector store
-            vectorStore.write(
-                new TokenTextSplitter().transform(
-                    new TextReader(termsOfServiceDocs).read()));
+        return args -> uploadDocs(vectorStore, termsOfServiceDocs);
+    }
 
-            vectorStore.similaritySearch("Cancelling Bookings").forEach(doc -> {
-                logger.info("Similar Document: {}", doc.getContent());
-            });
-        };
+    private void uploadDocs(VectorStore vectorStore, Resource termsOfServiceDocs) {
+        List<Document> cancellingBookings = vectorStore.similaritySearch("Cancelling Bookings");
+        if (!cancellingBookings.isEmpty()) {
+            logger.info("Delete old docs");
+            vectorStore.delete(cancellingBookings.stream().map(Document::getId).collect(Collectors.toList()));
+        }
+
+        logger.info("Ingest the new document into the vector store");
+        vectorStore.write(
+            new TokenTextSplitter().transform(
+                new TextReader(termsOfServiceDocs).read()));
+
+        vectorStore.similaritySearch("Cancelling Bookings")
+            .forEach(doc -> logger.info("Similar Document: {}", doc.getContent()));
     }
 //
 //    @Bean
