@@ -49,7 +49,7 @@ jobs:
     preset: a100x2
     detach: true
     env:
-      MODEL: "llama3.2"
+      MODEL: "llama3.2:3b"
     http_port: "11434"
     entrypoint: "bash -c 'ollama serve & sleep 10 && ollama pull ${MODEL} && sleep infinity'"
 
