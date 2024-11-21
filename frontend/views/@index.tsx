@@ -41,24 +41,20 @@ export default function Index() {
     setWorking(true);
     addMessage({
       role: 'user',
-      content: message
+      content: message,
     });
-    let first = true;
-    AssistantService.chat(chatId, message)
-      .onNext(token => {
-        if (first && token) {
-          addMessage({
-            role: 'assistant',
-            content: token
-          });
 
-          first = false;
-        } else {
-          appendToLatestMessage(token);
-        }
-      })
-      .onError(() => setWorking(false))
-      .onComplete(() => setWorking(false));
+    try {
+      const response = await AssistantService.chat(chatId, message); // Directly get the full string
+      addMessage({
+        role: 'assistant',
+        content: response, // Full response from backend
+      });
+    } catch (error) {
+      console.error("Error occurred:", error);
+    } finally {
+      setWorking(false);
+    }
   }
 
   return (

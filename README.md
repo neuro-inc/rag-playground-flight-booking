@@ -10,8 +10,8 @@
 # Query examples
 ```
 Get booking details - booking number: 102, first: Jane, last: Smith
-ChangeBooking -  102, Jane, Smith, 2025-11-25, FUN FUN
-CancelBooking -  102, Jane, Smith
+ChangeBooking -  102, Jane, Smith, 2025-11-25, from: FUN, to: FUN
+CancelBooking -  booking number: 102, first: Jane, last: Smith
 ```
 
 # Run ollama locally:
