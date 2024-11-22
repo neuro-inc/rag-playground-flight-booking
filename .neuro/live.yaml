@@ -14,8 +14,8 @@ volumes:
     mount: /var/lib/postgresql/data
     local: pgdata
   pgdata_disk:
-      remote: disk:pgdata
-      mount: /var/lib/postgresql/data
+    remote: disk:pgdata
+    mount: /var/lib/postgresql/data
   docs:
     remote: storage:$[[ flow.project_id ]]/docs
     mount: /usr/src/app/docs
@@ -66,5 +66,5 @@ jobs:
           POSTGRES_DB: postgres
           PGDATA: ${{ volumes.pgdata.mount }}/pgdata
       volumes:
-          - ${{ volumes.pgdata.ref_rw }}
-#          - ${{ volumes.pgdata_disk.ref_rw }}
+#          - ${{ volumes.pgdata.ref_rw }}
+          - ${{ volumes.pgdata_disk.ref_rw }}
